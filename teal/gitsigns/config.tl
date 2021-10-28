@@ -118,18 +118,16 @@ M.schema = {
         • `show_count` to enable showing count of hunk, e.g. number of deleted
           lines.
 
-      Note if `hl`, `numhl` or `linehl` use a `GitSigns*` highlight and it is
-      not defined, it will be automatically derived by searching for other
-      defined highlights in the following order:
+      Note if a highlight is not defined, it will be automatically derived by
+      searching for other defined highlights in the following order:
         • `GitGutter*`
         • `Signify*`
         • `Diff*Gutter`
         • `diff*`
         • `Diff*`
 
-      For example if `signs.add.hl = GitSignsAdd` and `GitSignsAdd` is not
-      defined but `GitGutterAdd` is defined, then `GitSignsAdd` will be linked
-      to `GitGutterAdd`.
+      For example if `GitSignsAdd` is not defined but `GitGutterAdd` is defined,
+      then `GitSignsAdd` will be linked to `GitGutterAdd`.
     ]]
   },
 

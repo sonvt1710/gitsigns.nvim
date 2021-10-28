@@ -21,8 +21,7 @@ local subprocess = require('gitsigns.subprocess')
 local gs_hunks = require("gitsigns.hunks")
 local Hunk = gs_hunks.Hunk
 
-local setup_highlight = require('gitsigns.highlight').setup_highlight
-
+local setup_highlights = require('gitsigns.highlight').setup_highlights
 local config = require('gitsigns.config').config
 
 local api = vim.api
@@ -173,7 +172,8 @@ M.apply_word_diff = function(bufnr, row)
    for _, hunk in ipairs(cache[bufnr].hunks) do
       if lnum >= hunk.start and lnum <= hunk.vend then
          local size = (#hunk.added.lines + #hunk.removed.lines) / 2
-         local regions = require('gitsigns.diff_int').run_word_diff(hunk.removed.lines, hunk.added.lines)
+         local removed_regions, added_regions = require('gitsigns.diff_int').run_word_diff(hunk.removed.lines, hunk.added.lines)
+         local regions = vim.list_extend(removed_regions or {}, added_regions or {})
          for _, region in ipairs(regions) do
             local line = region[1]
             if lnum == hunk.start + line - size - 1 then
@@ -192,6 +192,7 @@ M.apply_word_diff = function(bufnr, row)
                      rtype == 'change' and 'GitSignsChangeLn' or
                      'GitSignsDeleteLn',
                      ephemeral = true,
+                     priority = 1000,
                   })
                end
             end
@@ -296,16 +297,6 @@ M.setup_signs_and_highlights = function(redefine)
    for t, sign_name in pairs(signs.sign_map) do
       local cs = config.signs[t]
 
-      setup_highlight(cs.hl)
-
-      if config.numhl then
-         setup_highlight(cs.numhl)
-      end
-
-      if config.linehl or config.word_diff then
-         setup_highlight(cs.linehl)
-      end
-
       signs.define(sign_name, {
          texthl = cs.hl,
          text = config.signcolumn and cs.text or nil,
@@ -314,9 +305,8 @@ M.setup_signs_and_highlights = function(redefine)
       }, redefine)
 
    end
-   if config.current_line_blame then
-      setup_highlight('GitSignsCurrentLineBlame')
-   end
+
+   setup_highlights()
 end
 
 return M
